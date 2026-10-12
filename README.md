@@ -53,63 +53,16 @@ Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-
 | `/HizmetBilgileriSilAction.do` | HizmetBilgileriSilAction | EK-02 | Seçilen hizmet kaydını siler | EK-02'ye redirect |
 | `/EmeklilikHesaplaAction.do` | EmeklilikHesaplaAction | EK-02 | Emeklilik hesaplamasını yapar (asıl iş kuralları burada başlar) | EK-02'ye forward (redirect değil; sonuç request'te taşınıyor olabilir) |
 
+# Koddan çıkan notlar ve açık sorular
 
-**Koddan çıkan notlar ve açık sorular**
-
-*Kodla doğrulananlar*
-
-- **Hizmet listesi tablosu** (`hizmetBilgileri.jsp`): Kuruma özel bir displaytag sürümüyle çiziliyor. Liste `Sabit.LISTE` adlı attribute'tan okunuyor, sayfa başına 30 kayıt, varsayılan sıralama başlangıç tarihine göre (`defaultsort="2"`, `DateComparator`). Hizmet türü kod olarak tutuluyor, ekranda `HizmetTuruDecorator` ile metne ("Bağkur") çevriliyor.
-- **Satır seçimi satıra tıklayarak yapılıyor** (`trClick="true"`, `trClickParams="siraNo"`). Tıklanan satırı `tablo.js` içindeki `sec()` fonksiyonu `selected` sınıfıyla renklendiriyor ve `siraNo=N` değerini global `sEleman` değişkenine yazıyor. Ekranda seçim kutusu olmamasının sebebi bu.
-- **Butonlar** (`emektar:AddButton/EditButton/DeleteButton`, kurum içi tag'ler) `tablo.js` içindeki `submitjs()` ile çalışıyor:
-    - Seçim yapılmadan Güncelle veya Sil'e basılırsa `alert` ile uyarı çıkıyor, sunucuya istek gitmiyor (mesaj: `label.genel.kayitSeciniz`).
-    - Sil'de `confirm` ile onay isteniyor (mesaj: `label.genel.silinecek`). İki mesaj da `layout.jsp` içinde `Mesajlar` dosyasından okunuyor.
-    - Seçilen kayıt sunucuya **GET isteğiyle, URL parametresi olarak** gidiyor: `HizmetBilgileriSilAction.do?siraNo=N`. Sayfada `sayfa` alanı varsa liste sayfa numarası da ekleniyor.
-    - Hangi butonun `submitjs`'i hangi parametrelerle (`seciliOlmali`, `silmeIslemi`) çağırdığı tag sınıflarında veya sayfa kaynağında doğrulanacak.
-- **`validate="true"`** EmeklilikBilgileriAction, HizmetBilgileriEkleAction ve HizmetBilgileriGuncelleAction'da var. Bu yalnızca doğrulamanın çağrıldığını gösterir; gerçek kurallar form sınıfının `ValidatorForm`'dan türeyip türemediğine ve `validation.xml` içeriğine bağlı. Doğrulama ilk hatada duruyor (`stopOnFirstError=true`), hata mesajları `tr.gov.sgk.emektarWeb.genel.resource.Mesajlar` dosyasında, ekranda `messages.jsp` ile gösteriliyor.
-
-- **Tüm veri HTTP session'da tutuluyor; Action'larda veri tabanı erişimi yok.**
-    - `EmeklilikBilgileriAction`, EK-01 formunu `Sabit.SESSION_EMEKLILIKBILGILERI` altına koyuyor ve `Sabit.SESSION_HIZMETLISTESI` altına **yeni, boş** bir hizmet listesi açıyor.
-    - Ekle, Güncelle ve Sil action'ları bu session listesini değiştiriyor; `HizmetBilgileriListeleAction` listeyi ekranda gösterilmek üzere request'e `Sabit.LISTE` adıyla kopyalıyor.
-    - `EmeklilikHesaplaAction` iki session nesnesini okuyor, sonucu request'e `HakKazanmaSonucForm` olarak koyup EK-02'ye forward ediyor. Sonuç bu yüzden yalnızca o istekte görünür; sayfa yenilenir veya başka işlem yapılırsa kaybolur.
-- **EK-01'e dönmek baştan başlamak demek.** TAMAM'a her basıldığında hizmet listesi sıfırlanıyor; daha önce girilen hizmetler silinir.
-- **`siraNo` = listeye eklenme anındaki `liste boyutu + 1`.** Güncelle ve Sil, listede bu numaraya sahip **ilk** kaydı bulup işlem yapıyor. Güncelle, eski kaydı silip yenisini listenin sonuna ekliyor (ekranda tarihe göre sıralandığı için görünmüyor).
-- **Hesaplama öncesi iş kontrolleri `EmeklilikHesaplaAction` içinde** (yalnızca "Sadece yurt dışı borçlanması" işaretli değilse):
-    1. Listede en az bir Bağkur hizmeti olmalı; yoksa "Bağkur hizmetinizi giriniz".
-    2. `getSon7YilKurum(...)` Bağkur dönmüyorsa hesaplama yapılmaz. Mesaj, `getSBaslangicTarihi(...)` 30.04.2008'den sonraysa "toplam hizmet süresine göre en fazla çalışılan kurum Bağkur değil", değilse "son 7 yıldaki fiili çalışmaya göre Bağkurdan emekli olamazsınız".
-    3. Kontroller geçilirse `HakKazanmaService.hakKazanmaSorgula()` emeklilik şartlarını, `getHakKazanmaSonuc()` sonucu üretiyor. Asıl hesaplama bu iki metotta ve `HizmetBilgileriService` içinde.
-- **"Sadece yurt dışı borçlanması" işaretliyse yalnızca bir hizmet girilebiliyor.** `HizmetBilgileriEkleSayfaAction`, listede zaten bir kayıt varsa "Yurt dışı borçlanma hizmeti tek kalemde girilir" hatasıyla EK-02'ye döndürüyor.
-- Hesaplama ve 3201 hata mesajları **Türkçe metin olarak koda gömülü** (`error.hata` anahtarına parametre olarak veriliyor). Başarı mesajları ise `Mesajlar` dosyasında: `mesaj.hakKazanma.hizmetEklendi`, `hizmetGuncellendi`, `hizmetSilindi`.
-
-*Bilinen tuhaflıklar ve hatalar (yeni sistemde korunacak mı, düzeltilecek mi karar verilecek)*
-
-- **Tekrarlayan `siraNo`:** 3 kayıt varken 1 numara silinip yeni kayıt eklenirse, yeni kayda da 3 verilir (boyut 2 + 1). Aynı numaralı iki kayıt oluşur; Güncelle ve Sil yalnızca ilkini etkiler.
-- **`siraNo` doğrulanmıyor:** Parametre yoksa `Integer.valueOf(null)` hata fırlatır. Listede olmayan bir numara gelirse Sil hiçbir şey silmeden yine "silindi" mesajı gösterir; GüncelleSayfa boş form açar.
-- **Session süresi dolarsa** tüm action'lar session nesnelerini kontrolsüz okuduğu için `NullPointerException` alır; `global-exceptions` boş olduğundan kullanıcıya sunucunun genel hata sayfası çıkar.
-- Hesaplama kontrolleri ve iş kuralları Action katmanında; servis katmanında değil.
-
-*Ekran görüntülerinden gözlemler (kodla doğrulanacak)*
-
-- "Emeklilik Hesapla" butonu yalnızca listede en az bir hizmet varken görünüyor; boş listede başlık da "Tüm hizmet bilgilerinizi ekleyiniz" oluyor. Koşul, `hizmetBilgileri.jsp` içinde tablo parçasının dışında bir yerde olmalı.
+- Tüm form'lar `scope=request` olduğu hâlde EK-01 bilgileri ve hizmet listesi sayfalar arasında korunuyor; büyük ihtimalle session'da tutuluyor. Liste ve Hesapla action'larında doğrulanacak.
+- "Emeklilik Hesapla" butonu yalnızca listede en az bir hizmet varken görünüyor.
+- Ekranda satır seçim kutusu görünmüyor. Güncellenecek veya silinecek satır nasıl seçiliyor (satıra tıklama, JavaScript)?
 - "Maluliyet Derecesi" alanı, "Maluliyet Var mı?" Hayır iken pasif; bu bir JavaScript kuralı, yeni sistemde korunmalı.
-
-*Açık sorular*
-
-- [x] ~~EK-01 bilgileri ve hizmet listesi nerede tutuluyor?~~ Session'da (yukarıda).
-- [x] ~~Sil ve Güncelle `siraNo`'yu doğruluyor mu?~~ Hayır (Bilinen tuhaflıklar).
-- [x] ~~EK-01'e dönüş nasıl?~~ Buton yok; `/hakKazanma.do` ile baştan başlanır ve hizmet listesi sıfırlanır.
-- [ ] Uygulama veri tabanı kullanıyor mu? Action'larda erişim yok; `HakKazanmaService` ve `HizmetBilgileriService` içinde (ör. parametre tabloları) olabilir. `<data-sources/>` boş, varsa bağlantı Liberty `server.xml` üzerinden (JNDI) geliyor olmalı.
-- [ ] `getSon7YilKurum` ve `getSBaslangicTarihi` tam olarak neyi hesaplıyor? (`HizmetBilgileriService`)
-- [ ] `Sabit` sınıfındaki sabitlerin değerleri (`HIZMETTURU_BAGKUR`, `TARIH_30_04_2008` biçimi vb.)
-- [ ] Tiles için ikinci bir dosya yükleniyor: `istatistikAylikBaglama/tiles-defs.xml`. Bu modül bu uygulamaya mı ait, yoksa başka bir projeden kalma mı?
-
-*Spring Boot geçişi için notlar*
-
-- Satır seçimi, buton davranışları ve tablo görünümü kurum içi kütüphaneden (`emektar` tag'leri, özel displaytag, `tablo.js`) geliyor; yeni sistemde hazır gelmeyecek, yeniden yazılacak.
-- Session'daki iki nesne yeni sistemde de session'da (`@SessionAttributes` veya session-scoped bean) tutulabilir. Kalıcı kayıt gerekmiyor.
-- `siraNo` yerine benzersiz bir kimlik (ör. UUID veya artan sayaç) kullanılmalı; tekrarlayan numara hatası böylece ortadan kalkar.
-- Silme şu an GET ile yapılıyor; yeni sistemde POST (CSRF korumalı) olmalı. Gelen kimlik sunucuda doğrulanmalı.
-- Hesaplama öncesi kontroller Action'dan servis katmanına taşınmalı ki birim testle sınanabilsin.
-- Koda gömülü hata metinleri ve `Mesajlar.properties` anahtarları yeni sistemin mesaj dosyasına taşınmalı.
+- EK-02'den EK-01'e dönüş butonu yok. Emeklilik bilgilerini değiştirmek için baştan mı başlanıyor?
+- `<data-sources/>` boş; veri tabanı bağlantısı Liberty server.xml üzerinden (JNDI) geliyor olmalı.
+- Doğrulama validation.xml ile yapılıyor ve ilk hatada duruyor (`stopOnFirstError=true`). Hata mesajları `tr.gov.sgk.emektarWeb.genel.resource.Mesajlar` dosyasında, ekranda messages.jsp ile gösteriliyor.
+- Tiles için ikinci bir dosya yükleniyor: `istatistikAylikBaglama/tiles-defs.xml`. Bu modül bu uygulamaya mı ait, yoksa başka bir projeden kalma mı?
 
 Her ekranın ekran görüntüsünü bu tablonun altına ekle; yeni arayüz tasarlanırken referans olur.
 

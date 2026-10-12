@@ -34,14 +34,6 @@ Vatandaşın emeklilik tarihini elle hesaplama ihtiyacını ortadan kaldırmak.
 
 ---
 
-# 3. Ekran Listesi
-
-| Ekran ID | Ekran adı | URL (.do) | JSP | Ne yapılır | Sonraki ekran |
-|---|---|---|---|---|---|
-| EK-01 | Kişi Bilgi Girişi | `/giris.do` | `giris.jsp` | Doğum tarihi, cinsiyet, ilk sigorta tarihi, prim günü ve gerekli diğer bilgiler girilir. | EK-02 |
-| EK-02 | Hesaplama Sonucu | `/hesapla.do` | `sonuc.jsp` | Emeklilik tarihi ve varsa eksik emeklilik şartları gösterilir. | EK-01 |
-| EK-03 | — | — | — | — | — |
-
 # 3. Ekran listesi
 
 Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`struts-config.xml`, Struts 1.2). Tüm ekranlar `content4` Tiles şablonunu kullanır (`/layouts/sgkTemaUygulama/layout.jsp`: header, navigation, content, footer, messages); yalnızca content kısmı ekrana göre değişir. Hesaplama sonucu ayrı bir ekranda değil, Hizmet Bilgileri ekranının (EK-02) alt kısmında gösterilir.

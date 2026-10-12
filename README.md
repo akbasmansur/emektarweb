@@ -2,7 +2,7 @@
 
 | Alan | Bilgi |
 |---|---|
-| **Uygulama adı** | 4/b Ne Zaman Emekli Olabilirim? |
+| **Uygulama adı** | emektarweb |
 | **Doküman sürümü** | 0.1 (taslak) |
 | **Hazırlayan** | Xxxxx YYYYYYYY |
 | **Kapsam** | Mevcut sistemin davranışı; yeni sistem tasarımı bu dokümanda yer almaz. |

@@ -36,14 +36,14 @@ Vatandaşın emeklilik tarihini elle hesaplama ihtiyacını ortadan kaldırmak.
 
 # 3. Ekran listesi
 
-Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`struts-config.xml`, Struts 1.2). Tüm ekranlar `content4` Tiles şablonunu kullanır (`/layouts/sgkTemaUygulama/layout.jsp`: header, navigation, content, footer, messages); yalnızca content kısmı ekrana göre değişir. Hesaplama sonucu ayrı bir ekranda değil, Hizmet Bilgileri ekranının (EK-02) alt kısmında gösterilir.
+Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-config.xml`, Struts 1.2). Tüm ekranlar `content4` Tiles şablonunu kullanır (`/layouts/sgkTemaUygulama/layout.jsp`: header, navigation, content, footer, messages); yalnızca content kısmı ekrana göre değişir. Hesaplama sonucu ayrı bir ekranda değil, Hizmet Bilgileri ekranının (EK-02) alt kısmında gösterilir.
 
 | Ekran ID | Ekran adı | JSP (Tiles tanımı) | Ekranı açan action | Ekrandan gönderilen action (buton) | Form bean | Ne yapılır | Sonraki ekran |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| EK-01 | Emeklilik bilgileri girişi | `emeklilikBilgileri.jsp` (`tile.emeklilikHakKazanma.emeklilikBilgileri`) | `/hakKazanma.do` (ForwardAction, açılış sayfası) | `/EmeklilikBilgileriAction.do` (TAMAM) | EmeklilikBilgileriForm (validate=true) | Emeklilik türü, cinsiyet, doğum tarihi ve özel durumlar (maluliyet, erken yaşlanma, bakıma muhtaç malül çocuk, yurt dışı borçlanması) girilir | Başarılı: EK-02 · Hata: EK-01 |
-| EK-02 | Hizmet bilgileri ve hesaplama sonucu | `hizmetBilgileri.jsp` (`tile.emeklilikHakKazanma.hizmetBilgileri`) | `/EmeklilikBilgileriAction.do`, `/HizmetBilgileriListeleAction.do`, `/EmeklilikHesaplaAction.do` (forward) | Hizmet Ekle, Hizmet Güncelle, Hizmet Sil, Emeklilik Hesapla | – | EK-01 bilgileri salt okunur özetlenir, hizmet dönemleri listelenir; hesaplamadan sonra sigortalılık bilgileri, emeklilik şartları, kalan süreler ve emeklilik tarihi aynı sayfanın altında gösterilir | EK-03, EK-04 veya yine EK-02 |
-| EK-03 | Hizmet bilgisi ekleme | `hizmetBilgileriEkle.jsp` (`tile.emeklilikHakKazanma.hizmetBilgileriEkle`) | `/HizmetBilgileriEkleSayfaAction.do` | `/HizmetBilgileriEkleAction.do` (Kaydet); Listeye Dön | HizmetBilgileriForm (validate=true) | Hizmet türü, başlangıç ve bitiş tarihi, hizmet süresi ve eklenecek fiili hizmet süresi girilir | Başarılı: EK-02 (redirect) · Hata: EK-03 |
-| EK-04 | Hizmet bilgisi güncelleme | `hizmetBilgileriGuncelle.jsp` (`tile.emeklilikHakKazanma.hizmetBilgileriGuncelle`) | `/HizmetBilgileriGuncelleSayfaAction.do` | `/HizmetBilgileriGuncelleAction.do` (Güncelle); Listeye Dön | HizmetBilgileriForm (validate=true) | Seçilen hizmet döneminin alanları düzenlenir | Başarılı: EK-02 (redirect) · Hata: EK-04 |
+| EK-01 | Emeklilik bilgileri girişi | `emeklilikBilgileri.jsp` | `/hakKazanma.do` (ForwardAction, açılış sayfası) | `/EmeklilikBilgileriAction.do` (TAMAM) | EmeklilikBilgileriForm (validate=true) | Emeklilik türü, cinsiyet, doğum tarihi ve özel durumlar (maluliyet, erken yaşlanma, bakıma muhtaç malül çocuk, yurt dışı borçlanması) girilir | Başarılı: EK-02 · Hata: EK-01 |
+| EK-02 | Hizmet bilgileri ve hesaplama sonucu | `hizmetBilgileri.jsp` | `/EmeklilikBilgileriAction.do`, `/HizmetBilgileriListeleAction.do`, `/EmeklilikHesaplaAction.do` (forward) | Hizmet Ekle, Hizmet Güncelle, Hizmet Sil, Emeklilik Hesapla | – | EK-01 bilgileri salt okunur özetlenir, hesaplamadan sonra sigortalılık bilgileri, emeklilik şartları, kalan süreler ve emeklilik tarihi aynı sayfanın altında gösterilir | EK-03, EK-04 veya yine EK-02 |
+| EK-03 | Hizmet bilgisi ekleme | `hizmetBilgileriEkle.jsp` | `/HizmetBilgileriEkleSayfaAction.do` | `/HizmetBilgileriEkleAction.do` (Kaydet); Listeye Dön | HizmetBilgileriForm (validate=true) | Hizmet türü, başlangıç ve bitiş tarihi, hizmet süresi ve eklenecek fiili hizmet süresi girilir | Başarılı: EK-02 (redirect) · Hata: EK-03 |
+| EK-04 | Hizmet bilgisi güncelleme | `hizmetBilgileriGuncelle.jsp` | `/HizmetBilgileriGuncelleSayfaAction.do` | `/HizmetBilgileriGuncelleAction.do` (Güncelle); Listeye Dön | HizmetBilgileriForm (validate=true) | Seçilen hizmet döneminin alanları düzenlenir | Başarılı: EK-02 (redirect) · Hata: EK-04 |
 
 **Ekranı olmayan işlem action'ları**
 
@@ -177,5 +177,5 @@ Analiz sırasında cevaplanamayan her soru buraya yazılır; kime sorulacağı n
 **Sonraki adımlar**
 
 - [ ] Uygulamayı baştan sona kullanıp ekran görüntülerini ekle
-- [ ] Ekran listesini `struts-config.xml` ile karşılaştırıp tamamla
+- [ ] Ekran listesini `hakKazanma-struts-config.xml` ile karşılaştırıp tamamla
 - [ ] Doküman 3: Teknik Analiz ve Kod Haritası'na başla

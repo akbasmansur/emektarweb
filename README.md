@@ -8,6 +8,7 @@
 | **Kapsam** | Mevcut sistemin davranışı; yeni sistem tasarımı bu dokümanda yer almaz. |
 | **İlgili dokümanlar** | 2. İş Kuralları, 3. Kod Haritası, 4. Test Senaryoları |
 
+Kimlik kuralları: ekranlar EK-xx, iş kuralları KR-xx, tablolar DB-xx, testler TS-xx. Diğer dokümanlar bu ID'lere atıf yapar.
 ## Uygulamanın Amacı
 
 5510 4/1-b kapsamında sigortalı olan kişilerin; sigortalılık başlangıç tarihi, doğum tarihi, cinsiyet, prim ödeme gün sayısı ve ilgili mevzuatta belirtilen diğer koşullarını değerlendirerek, yaşlılık aylığına hak kazanabilecekleri tarihi hesaplayan yazılım uygulamasıdır.

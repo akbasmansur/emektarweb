@@ -54,14 +54,36 @@ Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-
 
 **Koddan çıkan notlar ve açık sorular**
 
-- Tüm form'lar `scope=request` olduğu hâlde EK-01 bilgileri ve hizmet listesi sayfalar arasında korunuyor; büyük ihtimalle session'da tutuluyor. Liste ve Hesapla action'larında doğrulanacak.
-- "Emeklilik Hesapla" butonu yalnızca listede en az bir hizmet varken görünüyor.
-- Ekranda satır seçim kutusu görünmüyor. Güncellenecek veya silinecek satır nasıl seçiliyor (satıra tıklama, JavaScript)?
+*Kodla doğrulananlar*
+
+- **Hizmet listesi tablosu** (`hizmetBilgileri.jsp`): Kuruma özel bir displaytag sürümüyle çiziliyor. Liste `Sabit.LISTE` adlı attribute'tan okunuyor, sayfa başına 30 kayıt, varsayılan sıralama başlangıç tarihine göre (`defaultsort="2"`, `DateComparator`). Hizmet türü kod olarak tutuluyor, ekranda `HizmetTuruDecorator` ile metne ("Bağkur") çevriliyor.
+- **Satır seçimi satıra tıklayarak yapılıyor** (`trClick="true"`, `trClickParams="siraNo"`). Tıklanan satırı `tablo.js` içindeki `sec()` fonksiyonu `selected` sınıfıyla renklendiriyor ve `siraNo=N` değerini global `sEleman` değişkenine yazıyor. Ekranda seçim kutusu olmamasının sebebi bu.
+- **Butonlar** (`emektar:AddButton/EditButton/DeleteButton`, kurum içi tag'ler) `tablo.js` içindeki `submitjs()` ile çalışıyor:
+    - Seçim yapılmadan Güncelle veya Sil'e basılırsa `alert` ile uyarı çıkıyor, sunucuya istek gitmiyor (mesaj: `label.genel.kayitSeciniz`).
+    - Sil'de `confirm` ile onay isteniyor (mesaj: `label.genel.silinecek`). İki mesaj da `layout.jsp` içinde `Mesajlar` dosyasından okunuyor.
+    - Seçilen kayıt sunucuya **GET isteğiyle, URL parametresi olarak** gidiyor: `HizmetBilgileriSilAction.do?siraNo=N`. Sayfada `sayfa` alanı varsa liste sayfa numarası da ekleniyor.
+    - Hangi butonun `submitjs`'i hangi parametrelerle (`seciliOlmali`, `silmeIslemi`) çağırdığı tag sınıflarında veya sayfa kaynağında doğrulanacak.
+- **`validate="true"`** EmeklilikBilgileriAction, HizmetBilgileriEkleAction ve HizmetBilgileriGuncelleAction'da var. Bu yalnızca doğrulamanın çağrıldığını gösterir; gerçek kurallar form sınıfının `ValidatorForm`'dan türeyip türemediğine ve `validation.xml` içeriğine bağlı. Doğrulama ilk hatada duruyor (`stopOnFirstError=true`), hata mesajları `tr.gov.sgk.emektarWeb.genel.resource.Mesajlar` dosyasında, ekranda `messages.jsp` ile gösteriliyor.
+
+*Ekran görüntülerinden gözlemler (kodla doğrulanacak)*
+
+- "Emeklilik Hesapla" butonu yalnızca listede en az bir hizmet varken görünüyor; boş listede başlık da "Tüm hizmet bilgilerinizi ekleyiniz" oluyor. Koşul, `hizmetBilgileri.jsp` içinde tablo parçasının dışında bir yerde olmalı.
 - "Maluliyet Derecesi" alanı, "Maluliyet Var mı?" Hayır iken pasif; bu bir JavaScript kuralı, yeni sistemde korunmalı.
-- EK-02'den EK-01'e dönüş butonu yok. Emeklilik bilgilerini değiştirmek için baştan mı başlanıyor?
-- `<data-sources/>` boş; veri tabanı bağlantısı Liberty `server.xml` üzerinden (JNDI) geliyor olmalı.
-- Doğrulama `validation.xml` ile yapılıyor ve ilk hatada duruyor (`stopOnFirstError=true`). Hata mesajları `tr.gov.sgk.emektarWeb.genel.resource.Mesajlar` dosyasında, ekranda `messages.jsp` ile gösteriliyor.
-- Tiles için ikinci bir dosya yükleniyor: `istatistikAylikBaglama/tiles-defs.xml`. Bu modül bu uygulamaya mı ait, yoksa başka bir projeden kalma mı?
+
+*Açık sorular*
+
+- [ ] Form'lar `scope=request` olduğu hâlde EK-01 bilgileri ve hizmet listesi sayfalar arasında korunuyor. `siraNo`'nun veri tabanı ID'si değil sıra numarası olması, listenin session'da tutulduğunu düşündürüyor. `Sabit.LISTE` değeri ve Action'larda hangi scope'a konduğu kontrol edilecek.
+- [ ] Sil ve Güncelle action'ları gelen `siraNo`'nun listede gerçekten var olup olmadığını kontrol ediyor mu?
+- [ ] EK-02'den EK-01'e dönüş butonu yok. Emeklilik bilgilerini değiştirmek için baştan mı başlanıyor?
+- [ ] `<data-sources/>` boş; veri tabanı bağlantısı Liberty `server.xml` üzerinden (JNDI) mı geliyor? Uygulama veri tabanı kullanıyor mu?
+- [ ] Tiles için ikinci bir dosya yükleniyor: `istatistikAylikBaglama/tiles-defs.xml`. Bu modül bu uygulamaya mı ait, yoksa başka bir projeden kalma mı?
+
+*Spring Boot geçişi için notlar*
+
+- Satır seçimi, buton davranışları ve tablo görünümü kurum içi kütüphaneden (`emektar` tag'leri, özel displaytag, `tablo.js`) geliyor; yeni sistemde hazır gelmeyecek, yeniden yazılacak.
+- Silme şu an GET ile yapılıyor; yeni sistemde POST (CSRF korumalı) olmalı.
+- `siraNo` URL'de açık gittiği için sunucu tarafında doğrulanmalı.
+- Uyarı ve onay mesajlarının metinleri `Mesajlar.properties` dosyasından taşınmalı.
 
 Her ekranın ekran görüntüsünü bu tablonun altına ekle; yeni arayüz tasarlanırken referans olur.
 

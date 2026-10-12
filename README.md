@@ -52,6 +52,7 @@ Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-
 | `/HizmetBilgileriSilAction.do` | HizmetBilgileriSilAction | EK-02 | Seçilen hizmet kaydını siler | EK-02'ye redirect |
 | `/EmeklilikHesaplaAction.do` | EmeklilikHesaplaAction | EK-02 | Emeklilik hesaplamasını yapar (asıl iş kuralları burada başlar) | EK-02'ye forward (redirect değil; sonuç request'te taşınıyor olabilir) |
 
+
 **Koddan çıkan notlar ve açık sorular**
 
 *Kodla doğrulananlar*
@@ -65,6 +66,26 @@ Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-
     - Hangi butonun `submitjs`'i hangi parametrelerle (`seciliOlmali`, `silmeIslemi`) çağırdığı tag sınıflarında veya sayfa kaynağında doğrulanacak.
 - **`validate="true"`** EmeklilikBilgileriAction, HizmetBilgileriEkleAction ve HizmetBilgileriGuncelleAction'da var. Bu yalnızca doğrulamanın çağrıldığını gösterir; gerçek kurallar form sınıfının `ValidatorForm`'dan türeyip türemediğine ve `validation.xml` içeriğine bağlı. Doğrulama ilk hatada duruyor (`stopOnFirstError=true`), hata mesajları `tr.gov.sgk.emektarWeb.genel.resource.Mesajlar` dosyasında, ekranda `messages.jsp` ile gösteriliyor.
 
+- **Tüm veri HTTP session'da tutuluyor; Action'larda veri tabanı erişimi yok.**
+    - `EmeklilikBilgileriAction`, EK-01 formunu `Sabit.SESSION_EMEKLILIKBILGILERI` altına koyuyor ve `Sabit.SESSION_HIZMETLISTESI` altına **yeni, boş** bir hizmet listesi açıyor.
+    - Ekle, Güncelle ve Sil action'ları bu session listesini değiştiriyor; `HizmetBilgileriListeleAction` listeyi ekranda gösterilmek üzere request'e `Sabit.LISTE` adıyla kopyalıyor.
+    - `EmeklilikHesaplaAction` iki session nesnesini okuyor, sonucu request'e `HakKazanmaSonucForm` olarak koyup EK-02'ye forward ediyor. Sonuç bu yüzden yalnızca o istekte görünür; sayfa yenilenir veya başka işlem yapılırsa kaybolur.
+- **EK-01'e dönmek baştan başlamak demek.** TAMAM'a her basıldığında hizmet listesi sıfırlanıyor; daha önce girilen hizmetler silinir.
+- **`siraNo` = listeye eklenme anındaki `liste boyutu + 1`.** Güncelle ve Sil, listede bu numaraya sahip **ilk** kaydı bulup işlem yapıyor. Güncelle, eski kaydı silip yenisini listenin sonuna ekliyor (ekranda tarihe göre sıralandığı için görünmüyor).
+- **Hesaplama öncesi iş kontrolleri `EmeklilikHesaplaAction` içinde** (yalnızca "Sadece yurt dışı borçlanması" işaretli değilse):
+    1. Listede en az bir Bağkur hizmeti olmalı; yoksa "Bağkur hizmetinizi giriniz".
+    2. `getSon7YilKurum(...)` Bağkur dönmüyorsa hesaplama yapılmaz. Mesaj, `getSBaslangicTarihi(...)` 30.04.2008'den sonraysa "toplam hizmet süresine göre en fazla çalışılan kurum Bağkur değil", değilse "son 7 yıldaki fiili çalışmaya göre Bağkurdan emekli olamazsınız".
+    3. Kontroller geçilirse `HakKazanmaService.hakKazanmaSorgula()` emeklilik şartlarını, `getHakKazanmaSonuc()` sonucu üretiyor. Asıl hesaplama bu iki metotta ve `HizmetBilgileriService` içinde.
+- **"Sadece yurt dışı borçlanması" işaretliyse yalnızca bir hizmet girilebiliyor.** `HizmetBilgileriEkleSayfaAction`, listede zaten bir kayıt varsa "Yurt dışı borçlanma hizmeti tek kalemde girilir" hatasıyla EK-02'ye döndürüyor.
+- Hesaplama ve 3201 hata mesajları **Türkçe metin olarak koda gömülü** (`error.hata` anahtarına parametre olarak veriliyor). Başarı mesajları ise `Mesajlar` dosyasında: `mesaj.hakKazanma.hizmetEklendi`, `hizmetGuncellendi`, `hizmetSilindi`.
+
+*Bilinen tuhaflıklar ve hatalar (yeni sistemde korunacak mı, düzeltilecek mi karar verilecek)*
+
+- **Tekrarlayan `siraNo`:** 3 kayıt varken 1 numara silinip yeni kayıt eklenirse, yeni kayda da 3 verilir (boyut 2 + 1). Aynı numaralı iki kayıt oluşur; Güncelle ve Sil yalnızca ilkini etkiler.
+- **`siraNo` doğrulanmıyor:** Parametre yoksa `Integer.valueOf(null)` hata fırlatır. Listede olmayan bir numara gelirse Sil hiçbir şey silmeden yine "silindi" mesajı gösterir; GüncelleSayfa boş form açar.
+- **Session süresi dolarsa** tüm action'lar session nesnelerini kontrolsüz okuduğu için `NullPointerException` alır; `global-exceptions` boş olduğundan kullanıcıya sunucunun genel hata sayfası çıkar.
+- Hesaplama kontrolleri ve iş kuralları Action katmanında; servis katmanında değil.
+
 *Ekran görüntülerinden gözlemler (kodla doğrulanacak)*
 
 - "Emeklilik Hesapla" butonu yalnızca listede en az bir hizmet varken görünüyor; boş listede başlık da "Tüm hizmet bilgilerinizi ekleyiniz" oluyor. Koşul, `hizmetBilgileri.jsp` içinde tablo parçasının dışında bir yerde olmalı.
@@ -72,22 +93,26 @@ Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-
 
 *Açık sorular*
 
-- [ ] Form'lar `scope=request` olduğu hâlde EK-01 bilgileri ve hizmet listesi sayfalar arasında korunuyor. `siraNo`'nun veri tabanı ID'si değil sıra numarası olması, listenin session'da tutulduğunu düşündürüyor. `Sabit.LISTE` değeri ve Action'larda hangi scope'a konduğu kontrol edilecek.
-- [ ] Sil ve Güncelle action'ları gelen `siraNo`'nun listede gerçekten var olup olmadığını kontrol ediyor mu?
-- [ ] EK-02'den EK-01'e dönüş butonu yok. Emeklilik bilgilerini değiştirmek için baştan mı başlanıyor?
-- [ ] `<data-sources/>` boş; veri tabanı bağlantısı Liberty `server.xml` üzerinden (JNDI) mı geliyor? Uygulama veri tabanı kullanıyor mu?
+- [x] ~~EK-01 bilgileri ve hizmet listesi nerede tutuluyor?~~ Session'da (yukarıda).
+- [x] ~~Sil ve Güncelle `siraNo`'yu doğruluyor mu?~~ Hayır (Bilinen tuhaflıklar).
+- [x] ~~EK-01'e dönüş nasıl?~~ Buton yok; `/hakKazanma.do` ile baştan başlanır ve hizmet listesi sıfırlanır.
+- [ ] Uygulama veri tabanı kullanıyor mu? Action'larda erişim yok; `HakKazanmaService` ve `HizmetBilgileriService` içinde (ör. parametre tabloları) olabilir. `<data-sources/>` boş, varsa bağlantı Liberty `server.xml` üzerinden (JNDI) geliyor olmalı.
+- [ ] `getSon7YilKurum` ve `getSBaslangicTarihi` tam olarak neyi hesaplıyor? (`HizmetBilgileriService`)
+- [ ] `Sabit` sınıfındaki sabitlerin değerleri (`HIZMETTURU_BAGKUR`, `TARIH_30_04_2008` biçimi vb.)
 - [ ] Tiles için ikinci bir dosya yükleniyor: `istatistikAylikBaglama/tiles-defs.xml`. Bu modül bu uygulamaya mı ait, yoksa başka bir projeden kalma mı?
 
 *Spring Boot geçişi için notlar*
 
 - Satır seçimi, buton davranışları ve tablo görünümü kurum içi kütüphaneden (`emektar` tag'leri, özel displaytag, `tablo.js`) geliyor; yeni sistemde hazır gelmeyecek, yeniden yazılacak.
-- Silme şu an GET ile yapılıyor; yeni sistemde POST (CSRF korumalı) olmalı.
-- `siraNo` URL'de açık gittiği için sunucu tarafında doğrulanmalı.
-- Uyarı ve onay mesajlarının metinleri `Mesajlar.properties` dosyasından taşınmalı.
+- Session'daki iki nesne yeni sistemde de session'da (`@SessionAttributes` veya session-scoped bean) tutulabilir. Kalıcı kayıt gerekmiyor.
+- `siraNo` yerine benzersiz bir kimlik (ör. UUID veya artan sayaç) kullanılmalı; tekrarlayan numara hatası böylece ortadan kalkar.
+- Silme şu an GET ile yapılıyor; yeni sistemde POST (CSRF korumalı) olmalı. Gelen kimlik sunucuda doğrulanmalı.
+- Hesaplama öncesi kontroller Action'dan servis katmanına taşınmalı ki birim testle sınanabilsin.
+- Koda gömülü hata metinleri ve `Mesajlar.properties` anahtarları yeni sistemin mesaj dosyasına taşınmalı.
 
 Her ekranın ekran görüntüsünü bu tablonun altına ekle; yeni arayüz tasarlanırken referans olur.
 
-# 4. Kullanıcı akışı
+## Kullanıcı akışı
 
 Kullanıcı önce kişisel emeklilik bilgilerini, sonra hizmet dönemlerini girer ve tek tuşla hesaplama yapar; akış ekran görüntülerinden çıkarılmıştır.
 
@@ -105,10 +130,15 @@ Kullanıcı önce kişisel emeklilik bilgilerini, sonra hizmet dönemlerini gire
 - EK-01'de doğrulama hatası: EK-01 yeniden gösterilir, mesaj `messages.jsp` alanında çıkar [hangi mesajlar?].
 - EK-03 / EK-04'te doğrulama hatası: aynı ekran yeniden gösterilir [hangi mesajlar?].
 - EK-03 / EK-04'te "Listeye Dön": kayıt yapılmadan EK-02'ye dönülür.
+- EK-02'de satır seçmeden Güncelle veya Sil: tarayıcıda uyarı çıkar, işlem yapılmaz. Sil'de ayrıca onay istenir.
+- "Sadece yurt dışı borçlanması" işaretli ve listede bir kayıt varken Hizmet Ekle: "Yurt dışı borçlanma hizmeti tek kalemde girilir" hatasıyla EK-02'de kalınır.
+- Emeklilik Hesapla, listede Bağkur hizmeti yokken: "Bağkur hizmetinizi giriniz" hatasıyla EK-02'de kalınır.
+- Emeklilik Hesapla, son 7 yıl veya toplam hizmete göre ağırlıklı kurum Bağkur değilken: 4/b'den emekli olunamayacağını söyleyen hatayla EK-02'de kalınır.
+- Session süresi dolduktan sonra herhangi bir işlem: genel sunucu hata sayfası.
 - Kişi şartları zaten sağlıyorsa: [sonuç ekranı ne gösteriyor?]
 - Veri tabanı veya sistem hatası: [genel hata sayfası var mı? `global-exceptions` boş]
 
-# 5. Girdiler ve çıktılar
+## Girdiler ve çıktılar
 
 Girdiler EK-01 ve EK-03/04 ekranlarından, çıktılar hesaplamadan sonra EK-02'nin altında gösterilen bloklardan alınmıştır. Zorunluluk bilgisi `validation.xml` ile doğrulanacaktır.
 
@@ -155,7 +185,7 @@ Sonucun altında iki sabit metin var: genel sağlık sigortası dahil prim borcu
 - Emeklilik tarihi, bugünden itibaren kalan 1800 günün 360 günlük yıl ile eklenmesine (5 yıl) karşılık geliyor; hizmetin bugünden sonra kesintisiz devam ettiği varsayılıyor olabilir.
 - Yaş 11 gün, sigortalılık 12 gün çıkıyor; sigortalılık hesabı başlangıç gününü de sayıyor olabilir.
 
-# 6. Teknik ortam
+## Teknik ortam
 
 Uygulama Java 8 üzerinde, gömülü Open Liberty içinde çalışan bir Struts 1 web uygulamasıdır; veri erişimi doğrudan JDBC ile yapılır.
 
@@ -174,7 +204,7 @@ Uygulama Java 8 üzerinde, gömülü Open Liberty içinde çalışan bir Struts 
 - **Yapılandırma dosyaları:** [`server.xml`, `.properties` dosyaları, ortam değişkenleri]
 - **Loglama:** [log4j / java.util.logging, log dosyalarının yeri]
 
-# 7. Dış bağımlılıklar
+## Dış bağımlılıklar
 
 Uygulamanın kendi veri tabanı dışında konuştuğu her sistem bir satırdır. Kodda `URL`, `HttpURLConnection`, `Socket`, `InitialContext` (JNDI), `ldap`, `File` ve dış JAR'ları arayarak bulunur.
 
@@ -186,7 +216,7 @@ Uygulamanın kendi veri tabanı dışında konuştuğu her sistem bir satırdır
 
 Bağımlılık yoksa "Dış bağımlılık yoktur" yaz; bu da önemli bir bilgidir.
 
-# 8. Açık sorular ve sonraki adımlar
+## Açık sorular ve sonraki adımlar
 
 Analiz sırasında cevaplanamayan her soru buraya yazılır; kime sorulacağı not edilir.
 
@@ -199,5 +229,5 @@ Analiz sırasında cevaplanamayan her soru buraya yazılır; kime sorulacağı n
 **Sonraki adımlar**
 
 - [ ] Uygulamayı baştan sona kullanıp ekran görüntülerini ekle
-- [ ] Ekran listesini `hakKazanma-struts-config.xml` ile karşılaştırıp tamamla
+- [ ] Ekran listesini `struts-config.xml` ile karşılaştırıp tamamla
 - [ ] Doküman 3: Teknik Analiz ve Kod Haritası'na başla

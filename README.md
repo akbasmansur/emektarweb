@@ -53,8 +53,7 @@ Uygulamada 4 ekran ve bunlardan tetiklenen 9 action vardır (`hakKazanma-struts-
 | `/HizmetBilgileriSilAction.do` | HizmetBilgileriSilAction | EK-02 | Seçilen hizmet kaydını siler | EK-02'ye redirect |
 | `/EmeklilikHesaplaAction.do` | EmeklilikHesaplaAction | EK-02 | Emeklilik hesaplamasını yapar (asıl iş kuralları burada başlar) | EK-02'ye forward (redirect değil; sonuç request'te taşınıyor olabilir) |
 
-# Koddan çıkan notlar ve açık sorular
-
+## Koddan çıkan notlar ve açık sorular
 - Tüm form'lar `scope=request` olduğu hâlde EK-01 bilgileri ve hizmet listesi sayfalar arasında korunuyor; büyük ihtimalle session'da tutuluyor. Liste ve Hesapla action'larında doğrulanacak.
 - "Emeklilik Hesapla" butonu yalnızca listede en az bir hizmet varken görünüyor.
 - Ekranda satır seçim kutusu görünmüyor. Güncellenecek veya silinecek satır nasıl seçiliyor (satıra tıklama, JavaScript)?

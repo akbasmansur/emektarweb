@@ -123,5 +123,5 @@ Sonuç ve emeklilik tarihi aynı ekranda gösterilir
 ![EK-02(output)](images/EK-02(output).png)
 ![EK-02](images/EK-02.png)
 ![EK-03](images/EK-03.png)
-***güncelleme sayfası***
 ![EK-04](images/EK-04.png)
+*EK-04. Güncelleme sayfası*

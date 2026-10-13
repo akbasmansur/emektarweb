@@ -95,12 +95,14 @@ Sonuç ve emeklilik tarihi aynı ekranda gösterilir
 
 ## 6. Ekranlar
 
-| Ekran | Ne yapılır |
-| --- | --- |
-| Emeklilik bilgileri girişi | Açılış ekranı. Kişisel bilgiler ve özel durumlar girilir. |
-| Hizmet bilgileri ve sonuç | Girilen emeklilik bilgileri özetlenir, hizmet dönemleri listelenir. Hizmet ekleme, güncelleme, silme ve emeklilik hesaplama buradan yapılır. Hesaplama sonucu aynı ekranın altında gösterilir. |
-| Hizmet ekleme | Yeni bir hizmet dönemi girilir. |
-| Hizmet güncelleme | Listeden seçilen hizmet dönemi düzenlenir. |
+Ekran kimlikleri (EK-xx) diğer dokümanlarda da aynı ekranı göstermek için kullanılır.
+
+| Ekran ID | Ekran | Ne yapılır |
+| --- | --- | --- |
+| EK-01 | Emeklilik bilgileri girişi | Açılış ekranı. Kişisel bilgiler ve özel durumlar girilir. |
+| EK-02 | Hizmet bilgileri ve sonuç | Girilen emeklilik bilgileri özetlenir, hizmet dönemleri listelenir. Hizmet ekleme, güncelleme, silme ve emeklilik hesaplama buradan yapılır. Hesaplama sonucu aynı ekranın altında gösterilir. |
+| EK-03 | Hizmet ekleme | Yeni bir hizmet dönemi girilir. |
+| EK-04 | Hizmet güncelleme | Listeden seçilen hizmet dönemi düzenlenir. |
 
 **Hesaplama sonucunda gösterilenler**
 

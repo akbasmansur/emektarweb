@@ -120,8 +120,12 @@ Sonuç ve emeklilik tarihi aynı ekranda gösterilir
 - Çoktan emekliliği hak ettiyse bunu direk desin. "01/01/2022 tarihinde emekli olabilirsiniz." gibi bir mesaj yerine direk söylesin. 
 
 ![EK-01](images/EK-01.png)
+*EK-04. Giriş sayfası*
 ![EK-02(output)](images/EK-02(output).png)
+*EK-04. Sonuç sayfası*
 ![EK-02](images/EK-02.png)
+*EK-04. Listeleme sayfası*
 ![EK-03](images/EK-03.png)
+*EK-03. Ekleme sayfası*
 ![EK-04](images/EK-04.png)
 *EK-04. Güncelleme sayfası*

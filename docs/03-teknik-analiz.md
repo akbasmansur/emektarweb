@@ -77,7 +77,7 @@ Tarayıcı ──GET/POST *.do──▶ ActionServlet (Struts)
                     forward / redirect ──▶ Tiles tanımı ──▶ layout.jsp + ekran JSP'si
 ```
 
-Uygulamada servis katmanı ince; iş kurallarının bir kısmı doğrudan Action ve form sınıflarında (bkz. bölüm 6 ve 8).
+<span style="color: red;">Uygulamada servis katmanı ince; iş kurallarının bir kısmı doğrudan Action ve form sınıflarında (bkz. bölüm 6 ve 8).<span>
 
 ## 5. Ekran – Action Haritası
 

@@ -5,7 +5,7 @@
 | --- | --- |
 | Doküman sürümü | 0.1 (taslak) |
 | Tarih | 13.10.2026 |
-| Kaynak | `uygulama.zip` (pom.xml sürümü 0.0.1-SNAPSHOT, uygulama sürümü `SabitLokal.version` = 1.1.0) |
+| Kaynak | emektarweb  |
 | İlgili dokümanlar | 01 Uygulama Genel Tanımı, 02 İş Kuralları, 04 Test Senaryoları |
 
 Bu doküman mevcut uygulamanın **nasıl yapıldığını** anlatır. Hesaplama kurallarının iş anlamı 02-is-kurallari.md dokümanındadır. Ekran kimlikleri (EK-xx) 01 ile aynıdır.

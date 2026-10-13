@@ -8,7 +8,7 @@
 | Kaynak | emektarweb  |
 | İlgili dokümanlar | 01 Uygulama Genel Tanımı, 02 İş Kuralları, 04 Test Senaryoları |
 
-Bu doküman mevcut uygulamanın **nasıl yapıldığını** anlatır. Hesaplama kurallarının iş anlamı 02-is-kurallari.md dokümanındadır. Ekran kimlikleri (EK-xx) 01 ile aynıdır.
+Bu doküman mevcut uygulamanın **nasıl yapıldığını** anlatır. Hesaplama kuralları 02-is-kurallari.md dokümanındadır. Ekran kimlikleri (EK-xx) 01 ile aynıdır.
 
 ---
 

@@ -5,10 +5,10 @@
 | --- | --- |
 | Doküman sürümü | 0.1 (taslak) |
 | Tarih | 13.10.2026 |
-| Kaynak | emektarweb  |
+| Kaynak | `uygulama.zip` (pom.xml sürümü 0.0.1-SNAPSHOT, uygulama sürümü `SabitLokal.version` = 1.1.0) |
 | İlgili dokümanlar | 01 Uygulama Genel Tanımı, 02 İş Kuralları, 04 Test Senaryoları |
 
-Bu doküman mevcut uygulamanın **nasıl yapıldığını** anlatır. Hesaplama kuralları 02-is-kurallari.md dokümanındadır. Ekran kimlikleri (EK-xx) 01 ile aynıdır.
+Bu doküman mevcut uygulamanın **nasıl yapıldığını** anlatır. Hesaplama kurallarının iş anlamı 02-is-kurallari.md dokümanındadır. Ekran kimlikleri (EK-xx) 01 ile aynıdır.
 
 ---
 
@@ -37,6 +37,7 @@ Bu doküman mevcut uygulamanın **nasıl yapıldığını** anlatır. Hesaplama 
 | JVM ayarı | `Europe/Istanbul`, `tr_TR`, UTF-8 | `jvm.options` |
 
 Context root: `/EMEKTARWEB`. Uygulama ortamı `UYG_PROFIL` ortam değişkeninden okunur (`LOKAL`, `TEST`, `PROD`).
+<div style="page-break-before: always;"></div>
 
 ## 3. Proje Yapısı
 
@@ -77,18 +78,33 @@ Tarayıcı ──GET/POST *.do──▶ ActionServlet (Struts)
                     forward / redirect ──▶ Tiles tanımı ──▶ layout.jsp + ekran JSP'si
 ```
 
-<span style="color: red;">Uygulamada servis katmanı ince; iş kurallarının bir kısmı doğrudan Action ve form sınıflarında (bkz. bölüm 6 ve 8).<span>
+Uygulamada servis katmanı ince; iş kurallarının bir kısmı doğrudan Action ve form sınıflarında (bkz. bölüm 6 ve 8).
 
 ## 5. Ekran – Action Haritası
 
 Bütün ekranlar `content4` Tiles şablonunu kullanır (`/layouts/sgkTemaUygulama/layout.jsp`); yalnızca içerik JSP'si değişir. Giriş adresi `index.jsp`'dir, `welcome` global forward'ı ile `/hakKazanma.do`'ya yönlendirir.
 
-| Ekran ID | Ekran | JSP | Ekranı açan action | Ekrandan gönderilen action | Form bean | Sonraki ekran |
-| --- | --- | --- | --- | --- | --- | --- |
-| EK-01 | Emeklilik bilgileri girişi | `emeklilikBilgileri.jsp` | `/hakKazanma.do` (ForwardAction) | `/EmeklilikBilgileriAction.do` (TAMAM) | EmeklilikBilgileriForm, validate=true | Başarılı: EK-02 · Hata: EK-01 |
-| EK-02 | Hizmet bilgileri ve sonuç | `hizmetBilgileri.jsp` | `/EmeklilikBilgileriAction.do`, `/HizmetBilgileriListeleAction.do`, `/EmeklilikHesaplaAction.do` | Ekle, Güncelle, Sil, Emeklilik Hesapla | – | EK-03, EK-04 veya EK-02 |
-| EK-03 | Hizmet ekleme | `hizmetBilgileriEkle.jsp` | `/HizmetBilgileriEkleSayfaAction.do` | `/HizmetBilgileriEkleAction.do` (Kaydet), Listeye Dön | HizmetBilgileriForm, validate=true | Başarılı: EK-02 (redirect) · Hata: EK-03 |
-| EK-04 | Hizmet güncelleme | `hizmetBilgileriGuncelle.jsp` | `/HizmetBilgileriGuncelleSayfaAction.do` | `/HizmetBilgileriGuncelleAction.do` (Güncelle), Listeye Dön | HizmetBilgileriForm, validate=true | Başarılı: EK-02 (redirect) · Hata: EK-04 |
+| ID | Ekran | JSP | Form bean |
+| --- | --- | --- | --- |
+| EK-01 | Emeklilik bilgileri girişi | `emeklilikBilgileri.jsp` | EmeklilikBilgileriForm<br>(validate=true) |
+| EK-02 | Hizmet bilgileri ve sonuç | `hizmetBilgileri.jsp` | – |
+| EK-03 | Hizmet ekleme | `hizmetBilgileriEkle.jsp` | HizmetBilgileriForm<br>(validate=true) |
+| EK-04 | Hizmet güncelleme | `hizmetBilgileriGuncelle.jsp` | HizmetBilgileriForm<br>(validate=true) |
+
+| ID | Ekranı açan action | Ekrandan gönderilen action | Sonraki ekran |
+| --- | --- | --- | --- |
+| EK-01 | `/hakKazanma.do`<br>(ForwardAction) | `/EmeklilikBilgileriAction.do`<br>(TAMAM) | Başarılı: EK-02<br>Hata: EK-01 |
+| EK-02 | `/EmeklilikBilgileriAction.do`<br>`/HizmetBilgileriListeleAction.do`<br>`/EmeklilikHesaplaAction.do` | Ekle<br>Güncelle<br>Sil<br>Emeklilik Hesapla | EK-03, EK-04<br>veya EK-02 |
+| EK-03 | `/HizmetBilgileriEkleSayfaAction.do` | `/HizmetBilgileriEkleAction.do` (Kaydet)<br>Listeye Dön | Başarılı: EK-02 (redirect)<br>Hata: EK-03 |
+| EK-04 | `/HizmetBilgileriGuncelleSayfaAction.do` | `/HizmetBilgileriGuncelleAction.do` (Güncelle)<br>Listeye Dön | Başarılı: EK-02 (redirect)<br>Hata: EK-04 |
+
+### EK-01 · Emeklilik bilgileri girişi
+- **JSP:** `emeklilikBilgileri.jsp`
+- **Açan action:** `/hakKazanma.do` (ForwardAction)
+- **Gönderilen action:** `/EmeklilikBilgileriAction.do` (TAMAM)
+- **Form bean:** EmeklilikBilgileriForm, validate=true
+- **Sonraki ekran:** Başarılı → EK-02 · Hata → EK-01
+
 
 **Action listesi**
 

@@ -120,6 +120,8 @@ Bütün ekranlar `content4` Tiles şablonunu kullanır (`/layouts/sgkTemaUygulam
 | `/HizmetBilgileriSilAction` | HizmetBilgileriSilAction | `siraNo`'lu kaydı siler | Listeyi değiştirir | EK-02 (redirect) |
 | `/EmeklilikHesaplaAction` | EmeklilikHesaplaAction | Ön kontroller + hesaplama | Listeyi **sıralar ve borçlanma tarihlerini değiştirir** (bkz. 12) | EK-02 (forward), sonuç request'te |
 
+<div style="page-break-before: always;"></div>
+
 ## 6. Formlar ve Doğrulama
 
 Doğrulama üç yerde yapılır; yeni sistemde hepsinin karşılığı olmalıdır.
@@ -166,6 +168,8 @@ Doğrulama üç yerde yapılır; yeni sistemde hepsinin karşılığı olmalıd�
 
 Doğum tarihi için **biçim veya aralık kontrolü yoktur** (ör. 10/01/1000 kabul edilir). Tarih alanlarında yalnızca tarayıcıdaki giriş maskesi (`InputMask.js`) var.
 
+
+
 ### 6.3 Java doğrulamaları (`HizmetBilgileriForm.validate`)
 
 Normal mod (sadece3201 = false):
@@ -203,6 +207,8 @@ Normal mod (sadece3201 = false):
 | EK-03/04 | gunFarkiniBul | Tarih alanından çıkınca hizmet süresini 360/30 kuralıyla hesaplar; bitiş 01.10.2008 ve sonrasıysa +1 gün |
 
 Bu kuralların hiçbiri sunucuda tekrar kontrol edilmez (ör. erkek için bakıma muhtaç çocuk sunucuda engellenmez, sadece hesaplamada etkisizdir).
+
+<div style="page-break-before: always;"></div>
 
 ## 7. Durum Yönetimi
 

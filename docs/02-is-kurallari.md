@@ -516,4 +516,4 @@ Kodun yaptığı ama doğruluğu şüpheli olan davranışlar. Yeni sistemde her
 | KR-41 | Sigortalılık bitişi ileri tarihli; emeklilik tarihi sigortalılık bitişine eşit (+1 gün); EYT'de 03.03.2023'e çekilme |
 | KR-42 | Bakılan gün 4'ün katı ve katı olmayan (ör. 1000, 1001) |
 
-Hesaplama tarihine bağlı oldukları için (KR-03) tüm senaryolarda hesaplama tarihi kaydedilmeli ve eski sistemde aynı gün çalıştırılmalıdır.
+Hesaplama tarihine bağlı oldukları için (KR-03) tüm senaryolarda hesaplama tarihi kaydedilmeli ve eski sistemde aynı gün çalıştırılmalıdır..
